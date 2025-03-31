@@ -1,7 +1,5 @@
-print("before import")
 from random import choice
 import csv
-print("after import")
 
 
 class TreeNode:
@@ -95,15 +93,19 @@ class WordleGame:
         self.game_state.load_game_data()
         self.load_words(words_file)
 
-    def load_words(self, file_path):
-        """Load words from a file into the BST."""
+    def load_words(self, file_path, limit=40):
+        """Load words from a file into the BST, stopping after a specified limit."""
         try:
             with open(file_path, "r") as file:
+                count = 0
                 for line in file:
+                    if count >= limit:
+                        break
                     self.word_tree.insert(line.strip().lower())
-                    print("inserted")
+                    count += 1
         except FileNotFoundError:
             print("Word file not found.")
+
 
     def get_new_word(self):
         """Retrieve a random word from the BST."""
@@ -116,24 +118,40 @@ class WordleGame:
             print("No words available.")
             return
         
-        print(f"New game for {player_name}. Try guessing the word!")
-        guessed_word = input("Enter your guess: ").strip().lower()
+        guess_list = ["_"] * len(target_word)  # Initialize with placeholders
+        word_list = list(target_word)
 
-        if guessed_word == target_word:
-            print("Correct! You win!")
-            self.game_state.update_score(player_name, 100)  # Example score update
-        else:
-            print(f"Wrong! The correct word was: {target_word}")
-            self.game_state.update_score(player_name, 0)  # No points for wrong guesses
+        print(f"New game for {player_name}. Try guessing the word!")
+
+        for _ in range(4):
+            guess_word = input("Enter your guess: ").strip().lower()
+
+            if guess_word == target_word:
+                print("Correct! You win!")
+                self.game_state.update_score(player_name, 100)  # Example score update
+                break  # Exit the loop if guessed correctly
+
+            else:
+                # Update guess_list to keep correctly guessed letters
+                for i, letter in enumerate(guess_word):
+                    if i < len(word_list) and letter == word_list[i]:  # Check index bounds
+                        guess_list[i] = letter  # Keep correct letters at correct positions
+
+                if any(char in word_list for char in guess_word):
+                    print("Some letters are correct")
+                    print(guess_list)
+                else:
+                    print("Wrong! None of the letters matched")
+                    print(guess_list)
+
+                print
+
 
 
 
 if __name__ == "__main__":
     try:
-        print("before the class")
         game = WordleGame()  # Likely point of failure
-        print("after the class")
         game.play_round("Alice")
-        print("after the round play")
     except Exception as e:
         print(f"Error: {e}")
