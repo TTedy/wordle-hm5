@@ -118,33 +118,56 @@ class WordleGame:
             print("No words available.")
             return
         
-        guess_list = ["_"] * len(target_word)  # Initialize with placeholders
-        word_list = list(target_word)
-
         print(f"New game for {player_name}. Try guessing the word!")
+        attempts = 4
 
-        for _ in range(4):
-            guess_word = input("Enter your guess: ").strip().lower()
+        for attempt in range(1, attempts + 1):
+            guess_word = input(f"Attempt {attempt}/{attempts} - Enter your guess: ").strip().lower()
+            
+            if len(guess_word) != 5:
+                print("Invalid input. Please enter exactly 5 letters.")
+                continue
 
             if guess_word == target_word:
                 print("Correct! You win!")
-                self.game_state.update_score(player_name, 100)  # Example score update
+                score = 100 -(attempt - 1) * 25
+                self.game_state.update_score(player_name, score)  # Example score update
                 break  # Exit the loop if guessed correctly
+            
+            feedback = ["_"] * 5
+            used_indices = []
+            
+            for i in range(5):
+                if guess_word[i] == target_word[i]:
+                    feedback[i] = f"[{guess_word[i].upper()}]"
+                    used_indices.append(i)
+                    
+            for i in range(5):
+                if feedback[i] == "_":
+                    for j in range(5):
+                        if j not in used_indices and guess_word[i] == target_word[j]:
+                            feedback[i] = f"({guess_word[i].upper()})"
+                            used_indices.append(j)
+                            break
+            print("Feedback:", " ".join(feedback))
 
-            else:
+            if attempt == attempts:
+                print(f"❌ Game over! The word was: {target_word}")
+
+            #else:
                 # Update guess_list to keep correctly guessed letters
-                for i, letter in enumerate(guess_word):
-                    if i < len(word_list) and letter == word_list[i]:  # Check index bounds
-                        guess_list[i] = letter  # Keep correct letters at correct positions
+                #for i, letter in enumerate(guess_word):
+                    #if i < len(word_list) and letter == word_list[i]:  # Check index bounds
+                        #guess_list[i] = letter  # Keep correct letters at correct positions
 
-                if any(char in word_list for char in guess_word):
-                    print("Some letters are correct")
-                    print(guess_list)
-                else:
-                    print("Wrong! None of the letters matched")
-                    print(guess_list)
+                #if any(char in word_list for char in guess_word):
+                    #print("Some letters are correct")
+                    #print(guess_list)
+                #else:
+                    #print("Wrong! None of the letters matched")
+                    #print(guess_list)
 
-                print
+                #print
 
 
 
