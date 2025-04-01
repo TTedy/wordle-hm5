@@ -110,6 +110,23 @@ class WordleGame:
     def get_new_word(self):
         """Retrieve a random word from the BST."""
         return self.word_tree.get_random_word()
+    
+    def display_letter_panel(self, letter_status):
+        """Display letter status panel showing green, yellow, and unused letters."""
+        import string
+        print("\nLetter Panel:")
+        panel = ""
+        for letter in string.ascii_lowercase:
+            status = letter_status.get(letter, "unused")
+            if status == "green":
+                panel += f"[{letter.upper()}] "  # Green
+            elif status == "yellow":
+                panel += f"({letter.upper()}) "  # Yellow
+            elif status == "unused":
+                panel += f" {letter.upper()}  "  # Still available
+        # ❌ If gray (wrong), do not show it at all
+
+        print(panel + "\n")
 
     def play_round(self, player_name):
         """Simulate a game round and update game state."""
@@ -120,6 +137,9 @@ class WordleGame:
         
         print(f"New game for {player_name}. Try guessing the word!")
         attempts = 4
+        
+        import string
+        letter_status = {letter: "unused" for letter in string.ascii_lowercase}
 
         for attempt in range(1, attempts + 1):
             guess_word = input(f"Attempt {attempt}/{attempts} - Enter your guess: ").strip().lower()
@@ -149,7 +169,18 @@ class WordleGame:
                             feedback[i] = f"({guess_word[i].upper()})"
                             used_indices.append(j)
                             break
+            for i in range(5):
+                letter = guess_word[i]
+                if feedback[i].startswith("["):
+                    letter_status[letter] = "green"
+                elif feedback[i].startswith("("):
+                     if letter_status[letter] != "green":  # Don't downgrade
+                        letter_status[letter] = "yellow"
+            else:
+                if letter_status[letter] not in ["green", "yellow"]:
+                    letter_status[letter] = "gray"
             print("Feedback:", " ".join(feedback))
+            self.display_letter_panel(letter_status)
 
             if attempt == attempts:
                 print(f"❌ Game over! The word was: {target_word}")
