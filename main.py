@@ -119,12 +119,11 @@ class WordleGame:
         for letter in string.ascii_lowercase:
             status = letter_status.get(letter, "unused")
             if status == "green":
-                panel += f"[{letter.upper()}] "  # Green
+                panel += f"[{letter.upper()}] "
             elif status == "yellow":
-                panel += f"({letter.upper()}) "  # Yellow
+                panel += f"({letter.upper()}) " 
             elif status == "unused":
-                panel += f" {letter.upper()}  "  # Still available
-        # ❌ If gray (wrong), do not show it at all
+                panel += f" {letter.upper()}  " 
 
         print(panel + "\n")
 
@@ -150,13 +149,13 @@ class WordleGame:
 
             if guess_word == target_word:
                 print("Correct! You win!")
-                score = 100 -(attempt - 1) * 25
-                self.game_state.update_score(player_name, score)  # Example score update
-                break  # Exit the loop if guessed correctly
+                score = 100 - (attempt - 1) * 25
+                self.game_state.update_score(player_name, score)
+                break
             
             feedback = ["_"] * 5
             used_indices = []
-            
+
             for i in range(5):
                 if guess_word[i] == target_word[i]:
                     feedback[i] = f"[{guess_word[i].upper()}]"
@@ -169,43 +168,32 @@ class WordleGame:
                             feedback[i] = f"({guess_word[i].upper()})"
                             used_indices.append(j)
                             break
+
             for i in range(5):
                 letter = guess_word[i]
                 if feedback[i].startswith("["):
                     letter_status[letter] = "green"
                 elif feedback[i].startswith("("):
-                     if letter_status[letter] != "green":  # Don't downgrade
+                    if letter_status[letter] != "green":
                         letter_status[letter] = "yellow"
-            else:
-                if letter_status[letter] not in ["green", "yellow"]:
-                    letter_status[letter] = "gray"
+                else:
+                    if letter_status[letter] not in ["green", "yellow"]:
+                        letter_status[letter] = "gray"
+
             print("Feedback:", " ".join(feedback))
             self.display_letter_panel(letter_status)
+            print()
 
             if attempt == attempts:
-                print(f"❌ Game over! The word was: {target_word}")
+                print(f"Game over! The word was: {target_word}")
 
-            #else:
-                # Update guess_list to keep correctly guessed letters
-                #for i, letter in enumerate(guess_word):
-                    #if i < len(word_list) and letter == word_list[i]:  # Check index bounds
-                        #guess_list[i] = letter  # Keep correct letters at correct positions
-
-                #if any(char in word_list for char in guess_word):
-                    #print("Some letters are correct")
-                    #print(guess_list)
-                #else:
-                    #print("Wrong! None of the letters matched")
-                    #print(guess_list)
-
-                #print
 
 
 
 
 if __name__ == "__main__":
     try:
-        game = WordleGame()  # Likely point of failure
+        game = WordleGame() 
         game.play_round("Alice")
     except Exception as e:
         print(f"Error: {e}")
